@@ -6,7 +6,7 @@
 /*   By: yejlee <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/29 15:56:45 by yejlee            #+#    #+#             */
-/*   Updated: 2021/08/18 19:41:25 by yejlee           ###   ########.fr       */
+/*   Updated: 2021/08/18 23:36:02 by yejlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 
 int	read_file(int fd, char **data)
 {
-	char	buffer[BUFFER_SIZE + 1];;
+	char	buffer[BUFFER_SIZE + 1];
 	char	*tmp;
 	int		res;
 
 	res = read(fd, buffer, BUFFER_SIZE);
 	if (res <= 0)
-		return (0);
+		return (res);
 	buffer[res] = '\0';
 	tmp = ft_strjoin(*data, buffer);
 	if (tmp == NULL)
@@ -52,8 +52,6 @@ char	*get_newline(char **data, char *newline, int idx)
 		newline = ft_strdup(*data);
 	else
 		newline = ft_strdup("");
-	if (!newline)
-		return (NULL);
 	tmp = ft_strdup(*data + idx + 1);
 	if (!tmp)
 		return (NULL);
@@ -79,7 +77,10 @@ char	*after_read_all(char **data, char *newline)
 	{
 		newline = ft_strdup("");
 		if (newline == NULL)
+		{
+			free(newline);
 			return (0);
+		}
 		return (0);
 	}
 }
@@ -88,12 +89,14 @@ char	*get_next_line(int fd)
 {
 	static char	*data[4096];
 	int			res;
+	int			i;
 	char		*tab;
 	char		*newline;
 
-	if (fd < 0 || fd > 4095 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	newline = 0;
+	i = 0;
 	while (1)
 	{
 		res  = read_file(fd, &data[fd]);
@@ -103,7 +106,7 @@ char	*get_next_line(int fd)
 		if (tab != 0)
 			return (tab);
 	}
-	if (res == -1 || tab == NULL) 
-		return (NULL);
+	if (res == -1  && tab[res] == '\0')
+		return (0);
 	return (after_read_all(&data[fd], newline));
 }
