@@ -6,7 +6,7 @@
 /*   By: yejlee <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/29 15:56:45 by yejlee            #+#    #+#             */
-/*   Updated: 2021/08/18 23:36:02 by yejlee           ###   ########.fr       */
+/*   Updated: 2021/08/20 16:46:27 by yejlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@ int	read_file(int fd, char **data)
 	buffer[res] = '\0';
 	tmp = ft_strjoin(*data, buffer);
 	if (tmp == NULL)
+	{
+		free(buffer);
 		return (0);
+	}
 	free(*data);
 	*data = tmp;
 	return (res);
@@ -76,11 +79,11 @@ char	*after_read_all(char **data, char *newline)
 	else
 	{
 		newline = ft_strdup("");
-		if (newline == NULL)
+		/*if (newline == NULL)
 		{
 			free(newline);
 			return (0);
-		}
+		}*/
 		return (0);
 	}
 }
@@ -89,14 +92,12 @@ char	*get_next_line(int fd)
 {
 	static char	*data[4096];
 	int			res;
-	int			i;
 	char		*tab;
 	char		*newline;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	newline = 0;
-	i = 0;
 	while (1)
 	{
 		res  = read_file(fd, &data[fd]);
@@ -106,7 +107,7 @@ char	*get_next_line(int fd)
 		if (tab != 0)
 			return (tab);
 	}
-	if (res == -1  && tab[res] == '\0')
+	if (res == -1)
 		return (0);
 	return (after_read_all(&data[fd], newline));
 }
