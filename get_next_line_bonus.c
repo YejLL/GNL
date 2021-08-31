@@ -6,11 +6,11 @@
 /*   By: yejlee <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/29 16:55:27 by yejlee            #+#    #+#             */
-/*   Updated: 2021/08/27 19:03:17 by yejlee           ###   ########.fr       */
+/*   Updated: 2021/08/31 13:51:10 by yejlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
 int	read_file(int fd, char **data)
 {
@@ -47,12 +47,12 @@ char	*get_newline(char **data, char *newline, int idx)
 	char	*tmp;
 	int		len;
 
-	(*data)[idx] = '\0';
+	//(*data)[idx] = '\0';
 	/*if (idx)
 		newline = ft_strdup(*data);
 	else
 		newline = ft_strdup("");*/
-	newline = ft_strdup(*data);
+	newline = ft_substr(*data, 0, idx + 1);
 	len = ft_strlen(*data + idx + 1);
 	if (len == 0)
 	{
