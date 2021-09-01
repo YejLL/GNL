@@ -6,7 +6,7 @@
 /*   By: yejlee <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/29 15:56:45 by yejlee            #+#    #+#             */
-/*   Updated: 2021/08/25 23:52:36 by yejlee           ###   ########.fr       */
+/*   Updated: 2021/09/01 12:41:36 by yejlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,10 @@
 
 int	read_file(int fd, char **data)
 {
-	char	buffer[BUFFER_SIZE + 1];;
+	char	buffer[BUFFER_SIZE + 1];
 	char	*tmp;
 	int		res;
 
-	//buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	//if (buffer == NULL)
-		//return (0);
 	res = read(fd, buffer, BUFFER_SIZE);
 	if (res == -1 || res == 0)
 		return (0);
@@ -30,7 +27,6 @@ int	read_file(int fd, char **data)
 		return (0);
 	free(*data);
 	*data = tmp;
-	//free(buffer);
 	return (res);
 }
 
@@ -43,18 +39,22 @@ char	*find_newline(char **data, char *newline)
 	{
 		return (get_newline(data, newline, idx));
 	}
-	return (0);	
+	return (NULL);
 }
 
 char	*get_newline(char **data, char *newline, int idx)
 {
 	char	*tmp;
+	int		len;
 
-	(*data)[idx] = '\0';
-	if (idx)
-		newline = ft_strdup(*data);
-	else
-		newline = ft_strdup("");	
+	newline = ft_substr(*data, 0, idx + 1);
+	len = ft_strlen(*data + idx + 1);
+	if (len == 0)
+	{
+		free(*data);
+		*data = NULL;
+		return (newline);
+	}
 	tmp = ft_strdup(*data + idx + 1);
 	if (!tmp)
 	{
@@ -69,7 +69,9 @@ char	*get_newline(char **data, char *newline, int idx)
 char	*after_read_all(char **data, char *newline)
 {
 	char	*res;
+	int		i;
 
+	i = 0;
 	if (*data)
 	{
 		res = find_newline(data, newline);
@@ -82,11 +84,13 @@ char	*after_read_all(char **data, char *newline)
 	else
 	{
 		newline = ft_strdup("");
-		if (newline == NULL)
+		if (newline[i] == '\0')
 		{
 			free(newline);
 			return (NULL);
 		}
+		else
+			i++;
 		return (0);
 	}
 }
@@ -98,12 +102,12 @@ char	*get_next_line(int fd)
 	char		*tab;
 	char		*newline;
 
-	if (fd < 0 || BUFFER_SIZE < 1)
+	if (fd < 0 || fd > 4095 || BUFFER_SIZE < 1)
 		return (NULL);
 	newline = 0;
 	while (1)
 	{
-		res  = read_file(fd, &data[fd]);
+		res = read_file(fd, &data[fd]);
 		if (res <= 0)
 			break ;
 		tab = find_newline(&data[fd], newline);
@@ -111,6 +115,9 @@ char	*get_next_line(int fd)
 			return (tab);
 	}
 	if (res == -1 && tab == NULL)
+	{
+		free(*data);
 		return (NULL);
+	}
 	return (after_read_all(&data[fd], newline));
 }
